@@ -13,6 +13,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_KIT_KEY: ${{ secrets.VITE_KIT_KEY }}
     steps:
       - uses: actions/checkout@v4
 
