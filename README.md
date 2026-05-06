@@ -1,23 +1,34 @@
 # arc-intent-oracle
 
-A working on-chain "intent oracle" built on Arc Testnet.
-
-Users connect their wallet, perform real on-chain actions (Send / Swap), and receive a sarcastic prediction seeded from the transaction hash.
+A beautiful wallet-connect app on Arc Testnet powered by Arc App Kit.
 
 ## What actually works
 
-| Action        | Status     | Details                                              | Contract / SDK             |
-|---------------|------------|------------------------------------------------------|----------------------------|
-| Send          | ✅ Working | 0.01 USDC to yourself via Circle App Kit             | App Kit                    |
-| Swap          | ✅ Working | USDC ↔ EURC via ApexiSwap Router (with WUSDC wrap)   | ApexiSwap Router v1        |
-| Volume Events | ✅ Working | Direct link to ApexiSwap trading competitions        | ApexiSwap                  |
-| Bridge        | ❌ Removed | Unstable on testnet (App Kit + CCTP)                 | —                          |
+- **Send 0.01 USDC** — stable and reliable
+- **Swap USDC ↔ EURC** — experimental (often fails on testnet)
+- **Bridge USDC** (both directions) — experimental (burn works, mint often doesn't complete)
 
 ## Quick start
 
-### 1. Clone and install
+1. `cp .env.example .env`
+2. Get a free **Kit Key** at https://console.circle.com/ (Keys → Kit Keys)
+3. Paste it in `.env`:
+   ```
+   VITE_KIT_KEY=KIT_KEY:your-key-here
+   ```
+4. `npm install && npm run dev`
+
+## Important note about Arc Testnet
+
+Circle testnet services (Stablecoin Service, iris-api) frequently return 404 and timeouts.  
+Swap and Bridge may not complete, but the app always delivers a beautiful sarcastic prediction.
+
+## Stack
+
+Vite + React + Tailwind + Arc App Kit + viem
+
+## Deploy to GitHub Pages
 
 ```bash
-git clone https://github.com/ostrov9878/arc-intent-oracle.git
-cd arc-intent-oracle
-npm install
+npm run deploy
+```
