@@ -3,7 +3,7 @@ import { Wallet, Send, ArrowLeftRight, ArrowUpRight, Zap, ExternalLink, Loader2 
 import { AppKit } from '@circle-fin/app-kit'
 import { createViemAdapterFromProvider } from '@circle-fin/adapter-viem-v2'
 import type { EIP1193Provider } from 'viem'
-import { createWalletClient, custom, createPublicClient, http, parseEther, parseUnits, formatUnits } from 'viem'
+import { createWalletClient, custom, createPublicClient, http, parseEther, parseUnits } from 'viem'
 
 const ARC_TESTNET = {
   id: 5042002,
@@ -188,15 +188,7 @@ export default function App() {
       const kit = new AppKit()
 
       let txHash = ''
-      let explorerUrl = ''
       let actionLabel = customIntent || actionType
-
-      // KIT_KEY нужен только для App Kit send
-      if (!hasKitKey && actionType === 'send') {
-        alert('Добавь VITE_KIT_KEY в .env для работы Send')
-        setIsExecuting(false)
-        return
-      }
 
       if (actionType === 'send') {
         // Реальный send 0.01 USDC самому себе на Arc Testnet
@@ -205,10 +197,8 @@ export default function App() {
           to: address,
           amount: '0.01',
           token: 'USDC',
-          config: { kitKey: KIT_KEY },
         })
         txHash = result.txHash || ''
-        explorerUrl = result.explorerUrl || `https://testnet.arcscan.app/tx/${txHash}`
         actionLabel = 'Send 0.01 USDC (self)'
       } else if (actionType === 'swap') {
         const amount = swapAmount || '1.00'
@@ -217,12 +207,8 @@ export default function App() {
 
         // ApexiSwap Router (v1, fee-on-transfer aware)
         const APEXI_ROUTER = '0x437b1aBf6e5a69548849b15EC35f83A73Fa1E28F' as const
-        const USDC = '0x3600000000000000000000000000000000000000' as const
         const EURC = '0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a' as const
         const WUSDC = '0x911b4000D3422F482F4062a913885f7b035382Df' as const
-
-        const tokenIn = isUSDCtoEURC ? USDC : EURC
-        const tokenOut = isUSDCtoEURC ? EURC : USDC
 
         const ERC20_ABI = [
           { name: 'approve', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ type: 'bool' }] },
@@ -394,7 +380,6 @@ export default function App() {
           }
 
           txHash = tx
-          explorerUrl = `https://testnet.arcscan.app/tx/${tx}`
           actionLabel = `Swap ${amount} ${directionLabel} via ApexiSwap`
         } catch (err: any) {
           const reason =
@@ -409,7 +394,6 @@ export default function App() {
           console.error('ApexiSwap revert reason:', reason)
           alert(`Swap failed: ${reason}. Showing a beautiful demo prediction.`)
           txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
-          explorerUrl = `https://testnet.arcscan.app/tx/${txHash}`
           actionLabel = `Swap ${amount} ${directionLabel} (demo)`
         }
       } else {
@@ -419,10 +403,8 @@ export default function App() {
           to: address,
           amount: '0.01',
           token: 'USDC',
-          config: { kitKey: KIT_KEY },
         })
         txHash = result.txHash || ''
-        explorerUrl = result.explorerUrl || `https://testnet.arcscan.app/tx/${txHash}`
       }
 
       if (!txHash) {
